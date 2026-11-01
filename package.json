@@ -1,0 +1,1 @@
+{"name":"bolsillo-testgpt","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node --test","check":"node --check dist/app.mjs && node --check dist/core.mjs"},"engines":{"node":">=20"}}
