@@ -1,0 +1,16 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Archivos temporales del editor
+*~
+*.swp
+*.swo
+
+# Configuración local (conservar ejemplos sin secretos)
+.env
+.env.*
+!.env.example
+
+# Añadir exclusiones de dependencias y compilación al elegir la tecnología.
