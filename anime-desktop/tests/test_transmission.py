@@ -22,7 +22,7 @@ class TransmissionTests(unittest.TestCase):
         with self.assertRaises(ValueError): send_to_transmission('', 'magnet:?xt=urn:btih:'+'a'*40)
     def test_settings_round_trip(self):
         with tempfile.TemporaryDirectory() as directory:
-            exe=Path(directory)/'transmission-qt.exe'; exe.touch()
+            exe=(Path(directory)/'transmission-qt.exe').resolve(); exe.touch()
             settings=Path(directory)/'settings.json'
             with patch('transmission.config_file',return_value=settings):
                 save_transmission(str(exe))
