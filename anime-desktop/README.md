@@ -11,7 +11,7 @@ App de escritorio independiente de Bolsillo, con Python 3.12 y Tkinter. Ejecutar
 
 ## Fuentes
 
-- Nyaa: búsqueda RSS de anime, títulos, tamaño, semillas y paginación.
+- Nyaa: búsqueda RSS de anime, títulos, tamaño, semillas. El RSS muestra los resultados recientes proporcionados por la fuente; no admite paginación. Afina la búsqueda para encontrar un episodio concreto.
 - Puedes pegar otra URL RSS HTTPS o página pública con enlaces magnet/.torrent.
 - UnionFansub: pega una sección pública para listar sus temas. El filtro solo busca entre los enlaces de esa página. Si requiere cuenta, usa **Abrir web**, inicia sesión en el navegador y pega el magnet o URL .torrent. No importa cookies ni accede a contenido privado automáticamente. El índice puede no mostrar temas o torrents.
 - Usa contenido que tengas derecho a descargar. No se almacenan contraseñas.
@@ -31,3 +31,7 @@ Alternativa: ejecutar manualmente el workflow **Compilar AnimeDesk para Windows*
 En el entorno Linux actual, no se ha podido validar la interfaz gráfica por falta de pantalla, ni generar/ejecutar un EXE de Windows. Los accesos a Nyaa y UnionFansub reciben 403 del proxy del entorno; la API de GitHub también devuelve Forbidden, lo que impide lanzar Actions desde aquí. No se ha descargado ningún torrent.
 
 Pendiente en Windows: compilar, comprobar búsquedas reales y envío a una instalación real de Transmission. Las pruebas simuladas no demuestran que las fuentes actuales funcionen.
+
+## Interfaz corregida
+
+El botón **Descargar en Transmission** está junto a Buscar. También puedes hacer doble clic en el torrent. Se ha quitado Siguiente porque el RSS de Nyaa no admite esa paginación. La tabla se ajusta a la ventana para mantener los botones y mensajes visibles.

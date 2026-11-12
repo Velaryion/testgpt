@@ -53,9 +53,9 @@ def parse(data,base):
             rows.append(Item(i.findtext('title','Sin título'),page,dl,i.findtext('n:size','—',ns),i.findtext('n:seeders','—',ns)))
         return rows
     parser=Links(base); parser.feed(data.decode('utf-8',errors='replace')); return parser.rows
-def fetch(source,query='',page=1):
+def fetch(source,query=''):
     https(source); nyaa=urlsplit(source).hostname=='nyaa.si'
-    url='https://nyaa.si/?'+urlencode({'page':'rss','q':query,'c':'1_0','f':0,'p':page}) if nyaa else source
+    url='https://nyaa.si/?'+urlencode({'page':'rss','q':query,'c':'1_0','f':0}) if nyaa else source
     with urlopen(Request(url,headers={'User-Agent':'AnimeDesk/0.1'}),timeout=20) as r:
         base=https(r.url); data=r.read(4*1024*1024+1)
     if len(data)>4*1024*1024: raise ValueError('Respuesta demasiado grande.')
