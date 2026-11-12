@@ -46,3 +46,11 @@ def send_to_transmission(executable, url):
     if not executable or not Path(executable).is_file():
         raise ValueError('Configura la ubicación de Transmission antes de descargar.')
     return subprocess.Popen([str(executable), url], shell=False)
+
+def send_file_to_transmission(executable, filename):
+    """Send a local torrent, not a protected URL lacking browser cookies."""
+    from torrent_file import validate_file
+    path = validate_file(filename)
+    if not executable or not Path(executable).is_file():
+        raise ValueError('Configura la ubicación de Transmission antes de descargar.')
+    return subprocess.Popen([str(executable), str(path)], shell=False)

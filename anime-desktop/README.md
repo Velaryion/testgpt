@@ -1,37 +1,39 @@
-# AnimeDesk · primera versión para Transmission
+# AnimeDesk para Transmission
 
-App de escritorio independiente de Bolsillo, con Python 3.12 y Tkinter. Ejecutar desde esta carpeta: `python app.py` (Windows: `py app.py`). No requiere paquetes de producción.
+App Windows con Python 3.12, Tkinter, pywebview 5.4 y Microsoft Edge WebView2 Runtime. El EXE incluye Python y pywebview, pero necesita WebView2 (habitual en Windows 10/11) y Transmission Qt instalados.
 
-## Usar con Transmission
+## Nyaa
 
-1. Instala Transmission Qt para Windows.
-2. AnimeDesk busca `transmission-qt.exe` en las ubicaciones habituales. Si no lo encuentra, pulsa **Configurar Transmission** y selecciona el ejecutable. Guarda la ruta en `%APPDATA%\AnimeDesk\settings.json`.
-3. Busca en Nyaa, selecciona un resultado y pulsa **Descargar**. Confirma el envío y comprueba en Transmission el torrent y su carpeta de destino. Admite enlaces magnet y URL HTTPS `.torrent`, enviados como argumentos a Transmission sin ejecutar una shell.
-4. Las transferencias y su progreso se gestionan en Transmission; esta versión no muestra el progreso dentro de AnimeDesk.
+Busca, selecciona y pulsa **Descargar en Transmission**, o haz doble clic. El RSS muestra resultados recientes y no admite paginación. La app detecta Transmission o permite seleccionar `transmission-qt.exe`. Guarda esa ruta en `%APPDATA%\AnimeDesk\settings.json`.
 
-## Fuentes
+## UnionFansub con tu cuenta
 
-- Nyaa: búsqueda RSS de anime, títulos, tamaño, semillas. El RSS muestra los resultados recientes proporcionados por la fuente; no admite paginación. Afina la búsqueda para encontrar un episodio concreto.
-- Puedes pegar otra URL RSS HTTPS o página pública con enlaces magnet/.torrent.
-- UnionFansub: pega una sección pública para listar sus temas. El filtro solo busca entre los enlaces de esa página. Si requiere cuenta, usa **Abrir web**, inicia sesión en el navegador y pega el magnet o URL .torrent. No importa cookies ni accede a contenido privado automáticamente. El índice puede no mostrar temas o torrents.
-- Usa contenido que tengas derecho a descargar. No se almacenan contraseñas.
+1. Selecciona `https://torrent.unionfansub.com/browse.php` y pulsa **Iniciar sesión / Catálogo**.
+2. La ventana integrada abre la web real. Inicia sesión y usa el buscador del tracker. La caja principal de búsqueda de Nyaa se desactiva para esta fuente.
+3. Descarga el `.torrent` desde la web y elige dónde guardarlo.
+4. Abre el menú de esa ventana **Transmission → Abrir archivo .torrent descargado…**, selecciona el archivo y confirma su envío.
+5. También puedes usar **Abrir .torrent local** en la ventana principal.
 
-## Crear EXE en Windows
+El catálogo del tracker se muestra en su propia ventana integrada, no en la tabla RSS de Nyaa. El navegador descarga el torrent con tu sesión; Transmission recibe el archivo local, sin necesitar tus cookies. Si hay captcha o segundo factor, resuélvelo en la web.
 
-Instala **Python 3.12 para Windows**, incluido su lanzador `py`. Haz doble clic en `crear-exe.cmd`: crea un entorno aislado, instala PyInstaller 6.16.0, ejecuta las pruebas, genera el EXE y comprueba su arranque. Abre la carpeta de salida al terminar. Requiere Internet para instalar PyInstaller.
+La sesión dura mientras mantengas abierta esa ventana. El perfil es privado y debes volver a iniciar sesión al cerrarla. AnimeDesk no guarda tu contraseña ni expone una API de Python al sitio. Los `.torrent` privados pueden contener identificadores de tu cuenta: no los compartas. Cerrar AnimeDesk no cierra automáticamente una ventana de UnionFansub en uso. Si ya está abierta, vuelve a ella desde la barra de tareas.
 
-Resultado: `dist/AnimeDesk.exe`. El equipo donde uses ese EXE no necesita Python; sí Transmission. El ejecutable no está firmado. El script instala y compila localmente; no sube archivos ni publica nada.
+Si falta WebView2, instala Microsoft Edge WebView2 Runtime desde Microsoft y vuelve a abrirla. Transmission gestiona progreso y carpeta de destino.
 
-Alternativa: ejecutar manualmente el workflow **Compilar AnimeDesk para Windows** tras subir el código a GitHub. Descarga su artefacto `AnimeDesk-Windows`. El workflow comprueba también el arranque del EXE antes de ofrecer el artefacto; publica una release con `AnimeDesk.exe` si la compilación y el arranque pasan. También se activa al subir cambios de la app a la rama `anime-desk`.
+## Otras fuentes
 
-## Estado de validación
+RSS HTTPS y páginas públicas con enlaces magnet/.torrent o temas `showthread.php?tid=…`. No es un buscador universal. **Ver publicación** usa tu navegador habitual. **Pegar magnet / .torrent** acepta enlaces públicos; para descargas privadas, guarda el torrent desde UnionFansub y ábrelo localmente.
 
-`python -m unittest discover -s tests -v`: nueve pruebas de RSS, enlaces del foro, deduplicación, validación, configuración y envío a Transmission (proceso simulado).
+Usa contenido que tengas derecho a descargar.
 
-En el entorno Linux actual, no se ha podido validar la interfaz gráfica por falta de pantalla, ni generar/ejecutar un EXE de Windows. Los accesos a Nyaa y UnionFansub reciben 403 del proxy del entorno; la API de GitHub también devuelve Forbidden, lo que impide lanzar Actions desde aquí. No se ha descargado ningún torrent.
+## Ejecutar o compilar
 
-Pendiente en Windows: compilar, comprobar búsquedas reales y envío a una instalación real de Transmission. Las pruebas simuladas no demuestran que las fuentes actuales funcionen.
+En Windows con Python 3.12: `python -m pip install -r requirements-windows.txt` y `python app.py`. Para compilar, doble clic en `crear-exe.cmd`. Resultado: `dist/AnimeDesk.exe`, sin Python en el equipo de destino. No está firmado.
 
-## Interfaz corregida
+El workflow **Compilar AnimeDesk para Windows** publica una release al subir cambios a `anime-desk`, si pasan las pruebas y los arranques de ambas ventanas.
 
-El botón **Descargar en Transmission** está junto a Buscar. También puedes hacer doble clic en el torrent. Se ha quitado Siguiente porque el RSS de Nyaa no admite esa paginación. La tabla se ajusta a la ventana para mantener los botones y mensajes visibles.
+## Validación
+
+`python ci_tests.py` comprueba RSS, enlaces, archivos torrent, envío simulado a Transmission y controles de interfaz en Windows. La prueba del navegador integrado usa HTML local y no inicia sesión ni contacta con UnionFansub.
+
+El entorno de desarrollo bloquea `torrent.unionfansub.com`. No se ha probado el acceso real con una cuenta, la búsqueda ni la descarga autenticada: sigue pendiente en el equipo del usuario. No se han descargado episodios durante el desarrollo.

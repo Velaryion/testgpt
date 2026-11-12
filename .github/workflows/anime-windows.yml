@@ -20,14 +20,20 @@ jobs:
         with:
           python-version: '3.12'
       - run: python ci_tests.py
-      - run: python -m pip install pyinstaller==6.16.0
-      - run: python -m PyInstaller --noconfirm --clean --onefile --windowed --name AnimeDesk app.py
+      - run: python -m pip install -r requirements-windows.txt
+      - run: python -m PyInstaller --noconfirm --clean --onefile --windowed --collect-all webview --name AnimeDesk app.py
       - name: Verificar arranque del EXE
         shell: pwsh
         run: |
           $app = Start-Process -FilePath .\dist\AnimeDesk.exe -ArgumentList '--smoke-test' -PassThru
           if (-not $app.WaitForExit(30000)) { $app.Kill(); throw 'La aplicación no cerró la prueba de arranque' }
           if ($app.ExitCode -ne 0) { throw "Error al iniciar el EXE: $($app.ExitCode)" }
+      - name: Verificar navegador integrado sin conexión
+        shell: pwsh
+        run: |
+          $app = Start-Process -FilePath .\dist\AnimeDesk.exe -ArgumentList '--browser-smoke-test' -PassThru
+          if (-not $app.WaitForExit(60000)) { $app.Kill(); throw 'No se cerró el navegador integrado' }
+          if ($app.ExitCode -ne 0) { throw 'Falló el navegador WebView2 integrado' }
       - uses: actions/upload-artifact@v4
         with:
           name: AnimeDesk-Windows
@@ -39,5 +45,5 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           $tag = "anime-desk-build-${{ github.run_number }}"
-          gh release create $tag dist/AnimeDesk.exe --target "${{ github.sha }}" --title "AnimeDesk · Windows · build ${{ github.run_number }}" --notes "Primera versión para Transmission. Compilada y con prueba de arranque en Windows. La búsqueda en las fuentes y el envío a Transmission requieren validación en el equipo del usuario."
+          gh release create $tag dist/AnimeDesk.exe --target "${{ github.sha }}" --title "AnimeDesk · Windows · build ${{ github.run_number }}" --notes "Versión para Transmission con navegador integrado para iniciar sesión en UnionFansub. Usa el catálogo dentro de esa ventana, guarda el .torrent y ábrelo desde el menú Transmission. Las pruebas de arranque y navegador se ejecutan sin conexión; el acceso real a UnionFansub requiere tu cuenta y no se ha validado en CI."
           if ($LASTEXITCODE -ne 0) { throw 'No se pudo publicar la descarga' }

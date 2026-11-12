@@ -31,3 +31,14 @@ class LayoutTests(unittest.TestCase):
                 app.download_button.invoke()
                 launch.assert_called_once_with(link)
         finally: app.destroy()
+    def test_tracker_opens_authenticated_browser_instead_of_empty_search(self):
+        app=App()
+        try:
+            app.source.set('https://torrent.unionfansub.com/browse.php')
+            app.update_source()
+            self.assertTrue(app.query.instate(['disabled']))
+            with patch.object(app,'open_union') as browser,patch('app.fetch') as fetch:
+                app.button.invoke()
+                browser.assert_called_once_with()
+                fetch.assert_not_called()
+        finally: app.destroy()
