@@ -1,0 +1,43 @@
+name: Compilar AnimeDesk para Windows
+on:
+  workflow_dispatch:
+  push:
+    branches: [anime-desk]
+    paths:
+      - 'anime-desktop/**'
+      - '.github/workflows/anime-windows.yml'
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: anime-desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+      - run: python -m pip install pyinstaller==6.16.0
+      - run: python -m PyInstaller --noconfirm --clean --onefile --windowed --name AnimeDesk app.py
+      - name: Verificar arranque del EXE
+        shell: pwsh
+        run: |
+          $app = Start-Process -FilePath .\dist\AnimeDesk.exe -ArgumentList '--smoke-test' -PassThru
+          if (-not $app.WaitForExit(30000)) { $app.Kill(); throw 'La aplicación no cerró la prueba de arranque' }
+          if ($app.ExitCode -ne 0) { throw "Error al iniciar el EXE: $($app.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AnimeDesk-Windows
+          path: anime-desktop/dist/AnimeDesk.exe
+      - name: Publicar ejecutable descargable
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $tag = "anime-desk-build-${{ github.run_number }}"
+          gh release create $tag dist/AnimeDesk.exe --target "${{ github.sha }}" --title "AnimeDesk · Windows · build ${{ github.run_number }}" --notes "Primera versión para Transmission. Compilada y con prueba de arranque en Windows. La búsqueda en las fuentes y el envío a Transmission requieren validación en el equipo del usuario."
+          if ($LASTEXITCODE -ne 0) { throw 'No se pudo publicar la descarga' }
